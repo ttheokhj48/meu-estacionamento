@@ -30,13 +30,9 @@ app.get('/ping', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
+// ✅ CORREÇÃO AQUI: Redireciona direto para login
 app.get('/', (req, res) => {
-  const indexPath = path.join(__dirname, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.send('Servidor rodando. Arquivos na pasta raiz.');
-  }
+  res.redirect('/login.html');
 });
 
 function tryMountRoute(routePath, mountPoint) {

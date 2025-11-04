@@ -4,10 +4,12 @@ require('dotenv').config();
 // Configuração do PostgreSQL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { 
+    rejectUnauthorized: false 
+  } : false
 });
 
-// Converter ? para $1, $2, $3 (SQLite → PostgreSQL)
+// Converter ? para $1, $2, $3
 function convertQuery(sql) {
   let paramCount = 0;
   return sql.replace(/\?/g, () => {
@@ -16,22 +18,20 @@ function convertQuery(sql) {
   });
 }
 
-// Testar conexão
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('❌ Erro ao conectar com PostgreSQL:', err.stack);
-  } else {
+// ✅ CORREÇÃO: Conexão ASSÍNCRONA que não bloqueia o servidor
+async function initializeDatabase() {
+  try {
+    const client = await pool.connect();
     console.log('✅ Conectado ao PostgreSQL com sucesso!');
     
-    // Criar tabelas
-    createTables(client)
-      .then(() => release())
-      .catch(err => {
-        console.error('Erro ao criar tabelas:', err);
-        release();
-      });
+    await createTables(client);
+    client.release();
+    
+  } catch (err) {
+    console.error('❌ Erro ao conectar/criar tabelas:', err.message);
+    // ✅ NÃO quebra o servidor - só loga o erro
   }
-});
+}
 
 // Função para criar tabelas
 async function createTables(client) {
@@ -59,7 +59,7 @@ async function createTables(client) {
       )
     `);
 
-    // Tabela de movimentos (entradas/saídas)
+    // Tabela de movimentos
     await client.query(`
       CREATE TABLE IF NOT EXISTS movimentos (
         id SERIAL PRIMARY KEY,
@@ -70,7 +70,7 @@ async function createTables(client) {
       )
     `);
 
-    // Criar índices para melhor performance
+    // Criar índices
     await client.query(`CREATE INDEX IF NOT EXISTS idx_placa_movimentos ON movimentos(placa)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_email_usuarios ON usuarios(email)`);
     await client.query(`CREATE INDEX IF NOT EXISTS idx_placa_veiculos ON veiculos(placa)`);
@@ -83,15 +83,15 @@ async function createTables(client) {
   }
 }
 
-// Manter a mesma interface do SQLite para compatibilidade
+// Interface compatível
 const db = {
   run: (sql, params = [], callback) => {
     const convertedSql = convertQuery(sql);
     return pool.query(convertedSql, params)
       .then(result => {
         const lastID = result.rows[0]?.id || result.insertId;
-        if (callback) callback(null, { lastID: lastID, changes: result.rowCount });
-        return { lastID: lastID, changes: result.rowCount };
+        if (callback) callback(null, { lastID, changes: result.rowCount });
+        return { lastID, changes: result.rowCount };
       })
       .catch(err => {
         if (callback) callback(err);
@@ -127,10 +127,12 @@ const db = {
       });
   },
   
-  // Para compatibilidade com db.serialize()
   serialize: (callback) => {
     callback();
   }
 };
 
-module.exports = db; 
+// ✅ INICIALIZAÇÃO NÃO-BLOQUEANTE
+initializeDatabase();
+
+module.exports = db;

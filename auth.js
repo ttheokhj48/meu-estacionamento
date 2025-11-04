@@ -21,13 +21,12 @@ router.post('/register', (req, res) => {
 
   const senhaCriptografada = bcrypt.hashSync(senha, 10);
 
-  // ✅ CORRIGIDO: usa parâmetros PostgreSQL ($1, $2, $3)
-  const query = 'INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3)';
+  const query = 'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)';
   db.run(query, [nome, email, senhaCriptografada], function (err) {
     if (err) {
       console.error('Erro ao cadastrar usuário:', err.message);
       
-      if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key')) {
+      if (err.message.includes('UNIQUE constraint failed') || err.message.includes('SQLITE_CONSTRAINT_UNIQUE')) {
         return res.status(400).json({ error: 'Este email já está cadastrado!' });
       }
       
@@ -45,8 +44,7 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Preencha todos os campos!' });
   }
 
-  // ✅ CORRIGIDO: usa parâmetros PostgreSQL
-  const query = 'SELECT * FROM usuarios WHERE email = $1';
+  const query = 'SELECT * FROM usuarios WHERE email = ?';
   db.get(query, [email], (err, usuario) => {
     if (err) {
       console.error('Erro ao buscar usuário:', err.message);

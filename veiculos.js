@@ -23,8 +23,7 @@ router.get('/', (req, res) => {
 router.get('/usuario/:usuario_id', (req, res) => {
   const { usuario_id } = req.params;
   
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const query = 'SELECT * FROM veiculos WHERE usuario_id = $1';
+  const query = 'SELECT * FROM veiculos WHERE usuario_id = ?';
   db.all(query, [usuario_id], (err, rows) => {
     if (err) {
       console.error('Erro ao listar veículos do usuário:', err.message);
@@ -47,8 +46,7 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Placa inválida! Formato esperado: ABC1D23' });
   }
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const checkUserQuery = 'SELECT id FROM usuarios WHERE id = $1';
+  const checkUserQuery = 'SELECT id FROM usuarios WHERE id = ?';
   db.get(checkUserQuery, [usuario_id], (err, usuario) => {
     if (err) {
       console.error('Erro ao verificar usuário:', err.message);
@@ -59,13 +57,12 @@ router.post('/', (req, res) => {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
 
-    // ✅ CORRIGIDO: $1, $2, $3, $4 em vez de ?, ?, ?, ?
-    const query = 'INSERT INTO veiculos (placa, modelo, cor, usuario_id) VALUES ($1, $2, $3, $4)';
+    const query = 'INSERT INTO veiculos (placa, modelo, cor, usuario_id) VALUES (?, ?, ?, ?)';
     db.run(query, [placa.toUpperCase(), modelo, cor, usuario_id], function (err) {
       if (err) {
         console.error('Erro ao cadastrar veículo:', err.message);
         
-        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key')) {
+        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('SQLITE_CONSTRAINT_UNIQUE')) {
           return res.status(400).json({ error: 'Esta placa já está cadastrada!' });
         }
         
@@ -89,7 +86,7 @@ router.get('/:id', (req, res) => {
     SELECT v.*, u.nome as usuario_nome 
     FROM veiculos v 
     LEFT JOIN usuarios u ON v.usuario_id = u.id 
-    WHERE v.id = $1  -- ✅ CORRIGIDO: $1 em vez de ?
+    WHERE v.id = ?
   `;
   db.get(query, [id], (err, veiculo) => {
     if (err) {
@@ -119,8 +116,7 @@ router.put('/:id', (req, res) => {
     return res.status(400).json({ error: 'Placa inválida! Formato esperado: ABC1D23' });
   }
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const checkQuery = 'SELECT id FROM veiculos WHERE id = $1';
+  const checkQuery = 'SELECT id FROM veiculos WHERE id = ?';
   db.get(checkQuery, [id], (err, veiculo) => {
     if (err) {
       console.error('Erro ao verificar veículo:', err.message);
@@ -131,8 +127,7 @@ router.put('/:id', (req, res) => {
       return res.status(404).json({ error: 'Veículo não encontrado.' });
     }
 
-    // ✅ CORRIGIDO: $1 em vez de ?
-    const checkUserQuery = 'SELECT id FROM usuarios WHERE id = $1';
+    const checkUserQuery = 'SELECT id FROM usuarios WHERE id = ?';
     db.get(checkUserQuery, [usuario_id], (err, usuario) => {
       if (err) {
         console.error('Erro ao verificar usuário:', err.message);
@@ -143,13 +138,12 @@ router.put('/:id', (req, res) => {
         return res.status(404).json({ error: 'Usuário não encontrado.' });
       }
 
-      // ✅ CORRIGIDO: $1, $2, $3, $4, $5 em vez de ?, ?, ?, ?, ?
-      const query = 'UPDATE veiculos SET placa = $1, modelo = $2, cor = $3, usuario_id = $4 WHERE id = $5';
+      const query = 'UPDATE veiculos SET placa = ?, modelo = ?, cor = ?, usuario_id = ? WHERE id = ?';
       db.run(query, [placa.toUpperCase(), modelo, cor, usuario_id, id], function (err) {
         if (err) {
           console.error('Erro ao editar veículo:', err.message);
           
-          if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key')) {
+          if (err.message.includes('UNIQUE constraint failed') || err.message.includes('SQLITE_CONSTRAINT_UNIQUE')) {
             return res.status(400).json({ error: 'Esta placa já está em uso por outro veículo!' });
           }
           
@@ -166,8 +160,7 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const checkQuery = 'SELECT id FROM veiculos WHERE id = $1';
+  const checkQuery = 'SELECT id FROM veiculos WHERE id = ?';
   db.get(checkQuery, [id], (err, veiculo) => {
     if (err) {
       console.error('Erro ao verificar veículo:', err.message);
@@ -178,8 +171,7 @@ router.delete('/:id', (req, res) => {
       return res.status(404).json({ error: 'Veículo não encontrado.' });
     }
 
-    // ✅ CORRIGIDO: $1 em vez de ?
-    const query = 'DELETE FROM veiculos WHERE id = $1';
+    const query = 'DELETE FROM veiculos WHERE id = ?';
     db.run(query, [id], function (err) {
       if (err) {
         console.error('Erro ao excluir veículo:', err.message);

@@ -1,62 +1,67 @@
 const { Pool } = require('pg');
 
-// Configuração MÍNIMA do PostgreSQL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
-// Interface simples
+// ✅ Criar tabelas na PRIMEIRA conexão
+let tablesCreated = false;
+
+async function ensureTables() {
+  if (tablesCreated) return;
+  
+  try {
+    const client = await pool.connect();
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id SERIAL PRIMARY KEY,
+        nome TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        senha TEXT NOT NULL,
+        data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS veiculos (
+        id SERIAL PRIMARY KEY,
+        placa TEXT UNIQUE NOT NULL,
+        modelo TEXT,
+        cor TEXT,
+        usuario_id INTEGER,
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS movimentos (
+        id SERIAL PRIMARY KEY,
+        placa TEXT NOT NULL,
+        hora_entrada TIMESTAMP NOT NULL,
+        hora_saida TIMESTAMP,
+        valor REAL DEFAULT 0
+      )
+    `);
+
+    client.release();
+    tablesCreated = true;
+    console.log('✅ Tabelas verificadas/criadas!');
+    
+  } catch (err) {
+    console.error('❌ Erro ao criar tabelas:', err.message);
+  }
+}
+
+// Converter ? para $1, $2, $3
+function convertQuery(sql) {
+  let paramCount = 0;
+  return sql.replace(/\?/g, () => `$${++paramCount}`);
+}
+
 const db = {
-  run: (sql, params = [], callback) => {
-    const convertedSql = sql.replace(/\?/g, (_, i) => `$${i + 1}`);
-    return pool.query(convertedSql, params)
-      .then(result => {
-        const response = { 
-          lastID: result.rows[0]?.id, 
-          changes: result.rowCount 
-        };
-        if (callback) callback(null, response);
-        return response;
-      })
-      .catch(err => {
-        if (callback) callback(err);
-        throw err;
-      });
-  },
-  
-  get: (sql, params = [], callback) => {
-    const convertedSql = sql.replace(/\?/g, (_, i) => `$${i + 1}`);
-    return pool.query(convertedSql, params)
-      .then(result => {
-        const row = result.rows[0] || null;
-        if (callback) callback(null, row);
-        return row;
-      })
-      .catch(err => {
-        if (callback) callback(err);
-        throw err;
-      });
-  },
-  
-  all: (sql, params = [], callback) => {
-    const convertedSql = sql.replace(/\?/g, (_, i) => `$${i + 1}`);
-    return pool.query(convertedSql, params)
-      .then(result => {
-        const rows = result.rows;
-        if (callback) callback(null, rows);
-        return rows;
-      })
-      .catch(err => {
-        if (callback) callback(err);
-        throw err;
-      });
-  },
-  
-  serialize: (callback) => callback()
-};
-
-// ✅ SEM inicialização automática - as rotas vão criar as tabelas quando necessário
-console.log('✅ Database configurado (conexão lazy)');
-
-module.exports = db;
+  run: async (sql, params = [], callback) => {
+    await ensureTables();
+    const convertedSql = convertQuery(sql);
+    // ... resto do código igual

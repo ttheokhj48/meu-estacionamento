@@ -344,7 +344,8 @@
   </div>
 
   <script>
-    const API_URL = 'http://localhost:3000/api/usuarios';
+    // ✅ URL CORRIGIDA para produção
+    const API_URL = '/api/usuarios';
 
     // Carregar usuários
     async function carregarUsuarios() {
@@ -482,7 +483,8 @@
     // Logout
     async function logout() {
       try {
-        await fetch('http://localhost:3000/api/auth/logout');
+        // ✅ URL CORRIGIDA para produção
+        await fetch('/api/auth/logout');
         window.location.href = 'login.html';
       } catch (error) {
         window.location.href = 'login.html';
@@ -507,4 +509,4 @@
     });
   </script>
 </body>
-</html> 
+</html>

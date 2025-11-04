@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - EstacionaFácil</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    :root {
+      --primary-blue: #1e40af;
+      --secondary-blue: #3b82f6;
+      --vibrant-blue: #2563eb;
+      --light-blue: #60a5fa;
+      --very-light-bg: #eff6ff;
+      --dark-blue: #1e3a8a;
+      --accent-blue: #93c5fd;
+      --success-green: #10b981;
+      --text-dark: #1e293b;
+      --text-light: #475569;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .login-container {
+      display: flex;
+      max-width: 900px;
+      width: 100%;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(30, 64, 175, 0.3);
+      overflow: hidden;
+      min-height: 550px;
+      border: 1px solid var(--accent-blue);
+    }
+
+    .welcome-section {
+      flex: 1;
+      background: linear-gradient(135deg, var(--vibrant-blue) 0%, var(--dark-blue) 100%);
+      color: white;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .welcome-section::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+    }
+
+    .form-section {
+      flex: 1;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: white;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--vibrant-blue);
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .welcome-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      line-height: 1.2;
+      color: white;
+    }
+
+    .welcome-subtitle {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.6;
+    }
+
+    .form-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .form-subtitle {
+      color: var(--text-light);
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      border-radius: 12px;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .form-control:focus {
+      border-color: var(--vibrant-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--vibrant-blue) 0%, var(--secondary-blue) 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success-green) 0%, #34d399 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+    }
+
+    .form-check-input:checked {
+      background-color: var(--vibrant-blue);
+      border-color: var(--vibrant-blue);
+    }
+
+    .text-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .text-link a {
+      color: var(--vibrant-blue);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .text-link a:hover {
+      color: var(--dark-blue);
+      text-decoration: underline;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 30px;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .feature-list li::before {
+      content: '✓';
+      color: #bfdbfe;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .car-animation {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 2rem;
+      animation: drive 3s ease-in-out infinite;
+    }
+
+    @keyframes drive {
+      0%, 100% { transform: translateX(0) scaleX(1); }
+      25% { transform: translateX(-10px) scaleX(1); }
+      50% { transform: translateX(-20px) scaleX(1); }
+      75% { transform: translateX(-10px) scaleX(1); }
+    }
+
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+        max-width: 400px;
+      }
+      
+      .welcome-section {
+        padding: 30px;
+      }
+      
+      .form-section {
+        padding: 30px;
+      }
+      
+      .car-animation {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <!-- Seção de Boas-vindas -->
+    <div class="welcome-section">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 13l4 4L19 7"></path>
+            <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="7" y1="15" x2="7" y2="17"></line>
+            <line x1="17" y1="15" x2="17" y2="17"></line>
+          </svg>
+        </div>
+        <div class="logo-text">EstacionaFácil</div>
+      </div>
+      
+      <h1 class="welcome-title">Controle Total do Seu Estacionamento</h1>
+      <p class="welcome-subtitle">
+        Gerencie entradas, saídas e pagamentos de forma simples e eficiente com nossa plataforma intuitiva.
+      </p>
+      
+      <ul class="feature-list">
+        <li>Controle de veículos em tempo real</li>
+        <li>Cálculo automático de valores</li>
+        <li>Relatórios detalhados</li>
+        <li>Interface moderna e responsiva</li>
+      </ul>
+
+      <div class="car-animation">🚗</div>
+    </div>
+
+    <!-- Seção do Formulário -->
+    <div class="form-section">
+      <div id="loginForm">
+        <h2 class="form-title">Bem-vindo de volta!</h2>
+        <p class="form-subtitle">Entre com suas credenciais para acessar o sistema</p>
+
+        <div class="mb-3">
+          <input type="email" class="form-control" id="loginEmail" placeholder="E-mail" required />
+        </div>
+        <div class="mb-3">
+          <input type="password" class="form-control" id="loginSenha" placeholder="Senha" required />
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="lembrar" />
+            <label class="form-check-label" for="lembrar">Lembrar-me</label>
+          </div>
+          <a href="#" style="color: var(--vibrant-blue); text-decoration: none; font-size: 0.9rem;">Esqueceu a senha?</a>
+        </div>
+        <button type="button" class="btn btn-primary w-100 mb-3" onclick="fazerLogin()">Entrar</button>
+
+        <p class="text-link">
+          Não tem uma conta? <a href="#" onclick="mostrarCadastro()">Criar conta</a>
+        </p>
+      </div>
+
+      <div id="cadastroForm" style="display: none;">
+        <h2 class="form-title">Criar Conta</h2>
+        <p class="form-subtitle">Preencha os dados para começar a usar o sistema</p>
+        
+        <input type="text" class="form-control mb-3" id="cadNome" placeholder="Nome completo" required />
+        <input type="email" class="form-control mb-3" id="cadEmail" placeholder="E-mail" required />
+        <input type="password" class="form-control mb-4" id="cadSenha" placeholder="Senha" required />
+        
+        <button type="button" class="btn btn-success w-100 mb-3" onclick="fazerCadastro()">Cadastrar</button>
+        
+        <p class="text-link">
+          Já tem uma conta? <a href="#" onclick="mostrarLogin()">Fazer login</a>
+        </p>
+      </div>
+
+      <div class="footer">Versão 2.0.0 © 2025 EstacionaFácil</div>
+    </div>
+  </div>
+
+  <script>
+    const API_AUTH = 'http://localhost:3000/api/auth';
+
+    function mostrarCadastro() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('cadastroForm').style.display = 'block';
+    }
+
+    function mostrarLogin() {
+      document.getElementById('cadastroForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+    }
+
+    async function fazerCadastro() {
+      const nome = document.getElementById('cadNome').value;
+      const email = document.getElementById('cadEmail').value;
+      const senha = document.getElementById('cadSenha').value;
+
+      if (!nome || !email || !senha) {
+        alert('Por favor, preencha todos os campos!');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_AUTH}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha })
+        });
+
+        const data = await res.json();
+        alert(data.message || data.error);
+        if (data.message) {
+          mostrarLogin();
+        }
+      } catch (error) {
+        alert('Erro de conexão. Verifique se o servidor está rodando.');
+        console.error('Erro:', error);
+      }
+    }
+
+    async function fazerLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const senha = document.getElementById('loginSenha').value;
+
+      if (!email || !senha) {
+        alert('Por favor, preencha todos os campos!');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_AUTH}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const data = await res.json();
+        alert(data.message || data.error);
+        if (data.message) {
+          window.location.href = 'index.html';
+        }
+      } catch (error) {
+        alert('Erro de conexão. Verifique se o servidor está rodando.');
+        console.error('Erro:', error);
+      }
+    }
+
+    // Enter key support
+    document.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        if (document.getElementById('loginForm').style.display !== 'none') {
+          fazerLogin();
+        } else {
+          fazerCadastro();
+        }
+      }
+    });
+  </script>
+</body>
+</html> 

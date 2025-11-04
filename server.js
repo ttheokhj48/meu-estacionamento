@@ -30,9 +30,19 @@ app.get('/ping', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// ✅ CORREÇÃO AQUI: Redireciona direto para login
+// ✅ REDIRECIONAMENTO GARANTIDO PARA LOGIN
 app.get('/', (req, res) => {
-  res.redirect('/login.html');
+  console.log('✅ REDIRECIONANDO para login...');
+  res.redirect(302, '/login.html');
+});
+
+// ✅ ROTA DE TESTE - para verificar se o servidor está funcionando
+app.get('/test', (req, res) => {
+  res.json({ 
+    message: 'Servidor funcionando!',
+    redirect: 'A rota / deve redirecionar para /login.html',
+    timestamp: new Date().toISOString()
+  });
 });
 
 function tryMountRoute(routePath, mountPoint) {
@@ -50,10 +60,10 @@ function tryMountRoute(routePath, mountPoint) {
 }
 
 // ✅ LINHAS CORRIGIDAS - procurando na RAIZ
-tryMountRoute('./auth', '/api/auth');
-tryMountRoute('./usuarios', '/api/usuarios');
-tryMountRoute('./veiculos', '/api/veiculos');
-tryMountRoute('./movimentos', '/api/movimentos');
+tryMountRoute('./auth.js', '/api/auth');
+tryMountRoute('./usuarios.js', '/api/usuarios');
+tryMountRoute('./veiculos.js', '/api/veiculos');
+tryMountRoute('./movimentos.js', '/api/movimentos');
 
 app.use((err, req, res, next) => {
   console.error('Erro interno:', err);

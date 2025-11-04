@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api/movimentos';
+// ✅ URL CORRETA para produção
+const API_URL = '/api';
 
 // registrar entrada 
 document.getElementById('formEntrada').addEventListener('submit', async (e) => {
@@ -11,7 +12,7 @@ document.getElementById('formEntrada').addEventListener('submit', async (e) => {
   }
 
   try {
-    const res = await fetch(`${API_URL}/entrada`, {
+    const res = await fetch(`${API_URL}/movimentos/entrada`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ placa: placa.toUpperCase() })
@@ -41,7 +42,7 @@ document.getElementById('formSaida').addEventListener('submit', async (e) => {
   }
 
   try {
-    const res = await fetch(`${API_URL}/saida/${id}`, { 
+    const res = await fetch(`${API_URL}/movimentos/saida/${id}`, { 
       method: 'PUT' 
     });
     
@@ -63,7 +64,7 @@ document.getElementById('btnListar').addEventListener('click', listarMovimentos)
 
 async function listarMovimentos() {
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(`${API_URL}/movimentos`);
     const movimentos = await res.json();
 
     const tbody = document.getElementById('tabelaBody');
@@ -107,7 +108,7 @@ async function listarMovimentos() {
 // logout
 async function logout() {
   try {
-    await fetch('http://localhost:3000/api/auth/logout');
+    await fetch(`${API_URL}/auth/logout`);
     window.location.href = '/login.html';
   } catch (error) {
     window.location.href = '/login.html';

@@ -24,25 +24,26 @@ app.use(session({
   }
 }));
 
-app.use(express.static(path.join(__dirname)));
-
-app.get('/ping', (req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() });
-});
-
-// ✅ REDIRECIONAMENTO GARANTIDO PARA LOGIN
+// ✅ ROTA / PRIMEIRO - ANTES do express.static
 app.get('/', (req, res) => {
   console.log('✅ REDIRECIONANDO para login...');
   res.redirect(302, '/login.html');
 });
 
-// ✅ ROTA DE TESTE - para verificar se o servidor está funcionando
+// ✅ ROTA DE TESTE
 app.get('/test', (req, res) => {
   res.json({ 
     message: 'Servidor funcionando!',
     redirect: 'A rota / deve redirecionar para /login.html',
     timestamp: new Date().toISOString()
   });
+});
+
+// ✅ DEPOIS os arquivos estáticos
+app.use(express.static(path.join(__dirname)));
+
+app.get('/ping', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
 function tryMountRoute(routePath, mountPoint) {
@@ -59,7 +60,6 @@ function tryMountRoute(routePath, mountPoint) {
   }
 }
 
-// ✅ LINHAS CORRIGIDAS - procurando na RAIZ
 tryMountRoute('./auth.js', '/api/auth');
 tryMountRoute('./usuarios.js', '/api/usuarios');
 tryMountRoute('./veiculos.js', '/api/veiculos');

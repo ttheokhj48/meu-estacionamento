@@ -349,7 +349,8 @@
   </div>
 
   <script>
-    const API_URL = 'http://localhost:3000/api/veiculos';
+    // ✅ URL CORRIGIDA para produção
+    const API_URL = '/api/veiculos';
 
     // Carregar veículos
     async function carregarVeiculos() {
@@ -478,7 +479,8 @@
     // Logout
     async function logout() {
       try {
-        await fetch('http://localhost:3000/api/auth/logout');
+        // ✅ URL CORRIGIDA para produção
+        await fetch('/api/auth/logout');
         window.location.href = 'login.html';
       } catch (error) {
         window.location.href = 'login.html';
@@ -496,4 +498,4 @@
     });
   </script>
 </body>
-</html> 
+</html>

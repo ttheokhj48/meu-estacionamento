@@ -414,18 +414,19 @@
   </div>
 
   <script>
-    const API_URL = 'http://localhost:3000/api/movimentos';
+    // ✅ URL CORRIGIDA para produção
+    const API_URL = '/api/movimentos';
 
     // Teste de conexão
     async function testarConexao() {
       try {
-        const response = await fetch('http://localhost:3000/ping');
+        const response = await fetch('/ping');
         if (!response.ok) throw new Error('Servidor não responde');
         console.log('✅ Conexão com servidor OK');
         return true;
       } catch (error) {
         console.error('❌ Erro de conexão:', error);
-        alert('Servidor não está respondendo. Verifique se o servidor está rodando na porta 3000.');
+        alert('Servidor não está respondendo. Verifique se o servidor está rodando.');
         return false;
       }
     }
@@ -546,7 +547,7 @@
     // logout
     async function logout() {
       try {
-        await fetch('http://localhost:3000/api/auth/logout');
+        await fetch('/api/auth/logout');
         window.location.href = 'login.html';
       } catch (error) {
         window.location.href = 'login.html';
@@ -563,4 +564,4 @@
     });
   </script>
 </body>
-</html> 
+</html>

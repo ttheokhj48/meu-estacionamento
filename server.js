@@ -53,11 +53,11 @@ function tryMountRoute(routePath, mountPoint) {
   }
 }
 
-// ✅ LINHAS CORRIGIDAS - procurando na RAIZ
-tryMountRoute('./auth', '/api/auth');
-tryMountRoute('./usuarios', '/api/usuarios');
-tryMountRoute('./veiculos', '/api/veiculos');
-tryMountRoute('./movimentos', '/api/movimentos');
+// ✅ CORRIGIDO: com .js nos arquivos
+tryMountRoute('./auth.js', '/api/auth');
+tryMountRoute('./usuarios.js', '/api/usuarios');
+tryMountRoute('./veiculos.js', '/api/veiculos');
+tryMountRoute('./movimentos.js', '/api/movimentos');
 
 app.use((err, req, res, next) => {
   console.error('Erro interno:', err);

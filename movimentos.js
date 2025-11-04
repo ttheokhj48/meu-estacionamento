@@ -54,10 +54,9 @@ router.post('/entrada', (req, res) => {
     return res.status(400).json({ error: 'Placa inválida! Use o formato: ABC1D23 ou ABC1234' });
   }
 
-  // ✅ CORRIGIDO: $1 em vez de ?
   const checkEstacionadoQuery = `
     SELECT * FROM movimentos 
-    WHERE placa = $1 AND hora_saida IS NULL
+    WHERE placa = ? AND hora_saida IS NULL
   `;
   db.get(checkEstacionadoQuery, [placa.toUpperCase()], (err, movimentoAtivo) => {
     if (err) {
@@ -71,8 +70,7 @@ router.post('/entrada', (req, res) => {
 
     const horaEntrada = new Date().toISOString();
 
-    // ✅ CORRIGIDO: $1, $2 em vez de ?, ?
-    const query = 'INSERT INTO movimentos (placa, hora_entrada) VALUES ($1, $2)';
+    const query = 'INSERT INTO movimentos (placa, hora_entrada) VALUES (?, ?)';
     db.run(query, [placa.toUpperCase(), horaEntrada], function (err) {
       if (err) {
         console.error('Erro ao registrar entrada:', err.message);
@@ -94,8 +92,7 @@ router.put('/saida/:id', (req, res) => {
   const { id } = req.params;
   const horaSaida = new Date().toISOString();
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const buscarQuery = 'SELECT * FROM movimentos WHERE id = $1';
+  const buscarQuery = 'SELECT * FROM movimentos WHERE id = ?';
   db.get(buscarQuery, [id], (err, movimento) => {
     if (err) {
       console.error('Erro ao buscar movimento:', err.message);
@@ -112,8 +109,7 @@ router.put('/saida/:id', (req, res) => {
 
     const valor = calcularValor(movimento.hora_entrada, horaSaida);
 
-    // ✅ CORRIGIDO: $1, $2, $3 em vez de ?, ?, ?
-    const updateQuery = 'UPDATE movimentos SET hora_saida = $1, valor = $2 WHERE id = $3';
+    const updateQuery = 'UPDATE movimentos SET hora_saida = ?, valor = ? WHERE id = ?';
     db.run(updateQuery, [horaSaida, valor, id], function (err) {
       if (err) {
         console.error('Erro ao registrar saída:', err.message);
@@ -137,8 +133,7 @@ router.put('/saida/:id', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
   
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const query = 'SELECT * FROM movimentos WHERE id = $1';
+  const query = 'SELECT * FROM movimentos WHERE id = ?';
   db.get(query, [id], (err, movimento) => {
     if (err) {
       console.error('Erro ao buscar movimento:', err.message);
@@ -157,8 +152,7 @@ router.get('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const checkQuery = 'SELECT id FROM movimentos WHERE id = $1';
+  const checkQuery = 'SELECT id FROM movimentos WHERE id = ?';
   db.get(checkQuery, [id], (err, movimento) => {
     if (err) {
       console.error('Erro ao verificar movimento:', err.message);
@@ -169,8 +163,7 @@ router.delete('/:id', (req, res) => {
       return res.status(404).json({ error: 'Movimento não encontrado.' });
     }
 
-    // ✅ CORRIGIDO: $1 em vez de ?
-    const query = 'DELETE FROM movimentos WHERE id = $1';
+    const query = 'DELETE FROM movimentos WHERE id = ?';
     db.run(query, [id], function (err) {
       if (err) {
         console.error('Erro ao excluir movimento:', err.message);

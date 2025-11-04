@@ -34,13 +34,12 @@ router.post('/', (req, res) => {
 
   const senhaCriptografada = bcrypt.hashSync(senha, 10);
 
-  // ✅ CORRIGIDO: $1, $2, $3 em vez de ?, ?, ?
-  const query = 'INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3)';
+  const query = 'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)';
   db.run(query, [nome, email, senhaCriptografada], function (err) {
     if (err) {
       console.error('Erro ao cadastrar usuário:', err.message);
       
-      if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key')) {
+      if (err.message.includes('UNIQUE constraint failed') || err.message.includes('SQLITE_CONSTRAINT_UNIQUE')) {
         return res.status(400).json({ error: 'Este email já está cadastrado!' });
       }
       
@@ -59,8 +58,7 @@ router.post('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const { id } = req.params;
   
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const query = 'SELECT id, nome, email, data_cadastro FROM usuarios WHERE id = $1';
+  const query = 'SELECT id, nome, email, data_cadastro FROM usuarios WHERE id = ?';
   db.get(query, [id], (err, usuario) => {
     if (err) {
       console.error('Erro ao buscar usuário:', err.message);
@@ -92,8 +90,7 @@ router.put('/:id', (req, res) => {
     return res.status(400).json({ error: 'Senha deve ter pelo menos 6 caracteres!' });
   }
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const checkQuery = 'SELECT id FROM usuarios WHERE id = $1';
+  const checkQuery = 'SELECT id FROM usuarios WHERE id = ?';
   db.get(checkQuery, [id], (err, usuario) => {
     if (err) {
       console.error('Erro ao verificar usuário:', err.message);
@@ -107,12 +104,10 @@ router.put('/:id', (req, res) => {
     let query, params;
     if (senha) {
       const senhaCriptografada = bcrypt.hashSync(senha, 10);
-      // ✅ CORRIGIDO: $1, $2, $3, $4 em vez de ?, ?, ?, ?
-      query = 'UPDATE usuarios SET nome = $1, email = $2, senha = $3 WHERE id = $4';
+      query = 'UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?';
       params = [nome, email, senhaCriptografada, id];
     } else {
-      // ✅ CORRIGIDO: $1, $2, $3 em vez de ?, ?, ?
-      query = 'UPDATE usuarios SET nome = $1, email = $2 WHERE id = $3';
+      query = 'UPDATE usuarios SET nome = ?, email = ? WHERE id = ?';
       params = [nome, email, id];
     }
 
@@ -120,7 +115,7 @@ router.put('/:id', (req, res) => {
       if (err) {
         console.error('Erro ao editar usuário:', err.message);
         
-        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('duplicate key')) {
+        if (err.message.includes('UNIQUE constraint failed') || err.message.includes('SQLITE_CONSTRAINT_UNIQUE')) {
           return res.status(400).json({ error: 'Este email já está em uso por outro usuário!' });
         }
         
@@ -136,8 +131,7 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
 
-  // ✅ CORRIGIDO: $1 em vez de ?
-  const checkQuery = 'SELECT id FROM usuarios WHERE id = $1';
+  const checkQuery = 'SELECT id FROM usuarios WHERE id = ?';
   db.get(checkQuery, [id], (err, usuario) => {
     if (err) {
       console.error('Erro ao verificar usuário:', err.message);
@@ -148,8 +142,7 @@ router.delete('/:id', (req, res) => {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
 
-    // ✅ CORRIGIDO: $1 em vez de ?
-    const query = 'DELETE FROM usuarios WHERE id = $1';
+    const query = 'DELETE FROM usuarios WHERE id = ?';
     db.run(query, [id], function (err) {
       if (err) {
         console.error('Erro ao excluir usuário:', err.message);

@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const db = require('../database');
+const db = require('./database');  // ✅ CORRIGIDO: sem ../
 
 const router = express.Router();
 
@@ -21,12 +21,13 @@ router.post('/register', (req, res) => {
 
   const senhaCriptografada = bcrypt.hashSync(senha, 10);
 
+  // ✅ CORRIGIDO: ?, ?, ? em vez de $1, $2, $3
   const query = 'INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)';
   db.run(query, [nome, email, senhaCriptografada], function (err) {
     if (err) {
       console.error('Erro ao cadastrar usuário:', err.message);
       
-      if (err.message.includes('UNIQUE constraint failed') || err.message.includes('SQLITE_CONSTRAINT_UNIQUE')) {
+      if (err.message.includes('UNIQUE constraint failed')) {
         return res.status(400).json({ error: 'Este email já está cadastrado!' });
       }
       
@@ -44,6 +45,7 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Preencha todos os campos!' });
   }
 
+  // ✅ CORRIGIDO: ? em vez de $1
   const query = 'SELECT * FROM usuarios WHERE email = ?';
   db.get(query, [email], (err, usuario) => {
     if (err) {

@@ -414,12 +414,13 @@
   </div>
 
   <script>
-    // ✅ URL CORRIGIDA para produção
+    // ✅ CORRIGIDO: URL relativa para produção
     const API_URL = '/api/movimentos';
 
     // Teste de conexão
     async function testarConexao() {
       try {
+        // ✅ CORRIGIDO: URL relativa
         const response = await fetch('/ping');
         if (!response.ok) throw new Error('Servidor não responde');
         console.log('✅ Conexão com servidor OK');
@@ -547,6 +548,7 @@
     // logout
     async function logout() {
       try {
+        // ✅ CORRIGIDO: URL relativa
         await fetch('/api/auth/logout');
         window.location.href = 'login.html';
       } catch (error) {
